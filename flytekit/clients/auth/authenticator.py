@@ -93,6 +93,8 @@ class PKCEAuthenticator(Authenticator):
         self,
         endpoint: str,
         cfg_store: ClientConfigStore,
+        audience: typing.Optional[str] = None,
+        scopes: typing.Optional[str] = None,
         header_key: typing.Optional[str] = None,
         verify: typing.Optional[typing.Union[bool, str]] = None,
     ):
@@ -102,16 +104,21 @@ class PKCEAuthenticator(Authenticator):
         super().__init__(endpoint, header_key, KeyringStore.retrieve(endpoint), verify=verify)
         self._cfg_store = cfg_store
         self._auth_client = None
+        self._audience = audience
+        self._scopes = scopes
 
     def _initialize_auth_client(self):
         if not self._auth_client:
             cfg = self._cfg_store.get_client_config()
             self._set_header_key(cfg.header_key)
+
             self._auth_client = AuthorizationClient(
                 endpoint=self._endpoint,
                 redirect_uri=cfg.redirect_uri,
                 client_id=cfg.client_id,
-                scopes=cfg.scopes,
+                audience=self._audience,  # Only needed for Auth0
+                scopes=self._scopes or cfg.scopes,  # If scopes passed in as separate \
+                # argument - that takes precedence over cfg.scopes - FOR AUTH0
                 auth_endpoint=cfg.authorization_endpoint,
                 token_endpoint=cfg.token_endpoint,
                 verify=self._verify,
@@ -120,12 +127,15 @@ class PKCEAuthenticator(Authenticator):
     def refresh_credentials(self):
         """ """
         self._initialize_auth_client()
+
         if self._creds:
             """We have an access token so lets try to refresh it"""
             try:
                 self._creds = self._auth_client.refresh_access_token(self._creds)
                 if self._creds:
                     KeyringStore.store(self._creds)
+
+                    logging.warning("FINISHING auth initialization")
                 return
             except AccessTokenNotFoundError:
                 logging.warning("Failed to refresh token. Kicking off a full authorization flow.")

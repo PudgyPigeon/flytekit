@@ -1,3 +1,4 @@
+import logging
 import typing
 from collections import namedtuple
 
@@ -33,13 +34,19 @@ class AuthUnaryInterceptor(grpc.UnaryUnaryClientInterceptor, grpc.UnaryStreamCli
         Returns new ClientCallDetails with metadata added.
         """
         metadata = None
+        logging.warning("METADATA IS NONE - THIS IS CALL DETAILS WITH AUTH METADATA")
         auth_metadata = self._authenticator.fetch_grpc_call_auth_metadata()
+        logging.warning(auth_metadata)
         if auth_metadata:
             metadata = []
+            logging.warning("THIS IS BEFORE EXTENDING METADATA")
+            logging.warning(client_call_details.metadata)
             if client_call_details.metadata:
+                logging.warning("THIS IS CLIENTCALLDETAILS.METADATA")
+                logging.warning(client_call_details)
                 metadata.extend(list(client_call_details.metadata))
             metadata.append(auth_metadata)
-
+        logging.warning(metadata)
         return _ClientCallDetails(
             client_call_details.method,
             client_call_details.timeout,
@@ -62,8 +69,10 @@ class AuthUnaryInterceptor(grpc.UnaryUnaryClientInterceptor, grpc.UnaryStreamCli
         e = fut.exception()
         if e:
             if e.code() == grpc.StatusCode.UNAUTHENTICATED:
+                logging.warning("CALLING FROM INTERCEPT UNARY UNARY")
                 self._authenticator.refresh_credentials()
                 updated_call_details = self._call_details_with_auth_metadata(client_call_details)
+                logging.warning("AFTER UPDATE CALLING DETAILS")
                 return continuation(updated_call_details, request)
         return fut
 
@@ -74,6 +83,7 @@ class AuthUnaryInterceptor(grpc.UnaryUnaryClientInterceptor, grpc.UnaryStreamCli
         updated_call_details = self._call_details_with_auth_metadata(client_call_details)
         c: grpc.Call = continuation(updated_call_details, request)
         if c.code() == grpc.StatusCode.UNAUTHENTICATED:
+            logging.warning("CALLING FROM INTERCEPT_UNARY_STREAM")
             self._authenticator.refresh_credentials()
             updated_call_details = self._call_details_with_auth_metadata(client_call_details)
             return continuation(updated_call_details, request)
