@@ -106,6 +106,10 @@ class PKCEAuthenticator(Authenticator):
         self._auth_client = None
         self._audience = audience
         self._scopes = scopes
+        logging.warning("AUDIENCE::")
+        logging.warning(audience)
+        logging.warning("SCOPES::")
+        logging.warning(scopes)
 
     def _initialize_auth_client(self):
         if not self._auth_client:
@@ -117,7 +121,7 @@ class PKCEAuthenticator(Authenticator):
                 redirect_uri=cfg.redirect_uri,
                 client_id=cfg.client_id,
                 audience=self._audience,  # Only needed for Auth0
-                scopes=self._scopes or cfg.scopes,  # If scopes passed in as separate \
+                scopes=self._scopes,  # or cfg.scopes,  # If scopes passed in as separate \
                 # argument - that takes precedence over cfg.scopes - FOR AUTH0
                 auth_endpoint=cfg.authorization_endpoint,
                 token_endpoint=cfg.token_endpoint,

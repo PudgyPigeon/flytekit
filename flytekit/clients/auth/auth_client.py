@@ -107,6 +107,7 @@ class OAuthCallbackHandler(_BaseHTTPServer.BaseHTTPRequestHandler):
             self.send_response(_StatusCodes.NOT_FOUND)
 
     def handle_login(self, data: dict):
+        logging.warning(data)
         self.server.handle_authorization_code(AuthorizationCode(data["code"], data["state"]))
 
 
@@ -224,6 +225,8 @@ class AuthorizationClient(metaclass=_SingletonPerEndpoint):
         self._verify = verify
         self._headers = {"content-type": "application/x-www-form-urlencoded"}
 
+        logging.warning(self._audience)
+
         self._params = {
             "client_id": client_id,  # This must match the Client ID of the OAuth application.
             "response_type": "code",  # Indicates the authorization code grant
@@ -237,6 +240,9 @@ class AuthorizationClient(metaclass=_SingletonPerEndpoint):
             "code_challenge": code_challenge,
             "code_challenge_method": "S256",
         }
+
+        logging.warning("SELF > PARAMAS")
+        logging.warning(self._params)
 
     def __repr__(self):
         return f"AuthorizationClient({self._auth_endpoint}, {self._token_endpoint}, {self._client_id}, {self._scopes}, {self._redirect_uri})"
@@ -289,6 +295,9 @@ class AuthorizationClient(metaclass=_SingletonPerEndpoint):
                 "grant_type": "authorization_code",
             }
         )
+
+        logging.warning("REQUEST ACCESS TOKEN")
+        logging.warning(self._params)
 
         resp = _requests.post(
             url=self._token_endpoint,

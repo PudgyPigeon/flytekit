@@ -83,7 +83,6 @@ class AuthUnaryInterceptor(grpc.UnaryUnaryClientInterceptor, grpc.UnaryStreamCli
         updated_call_details = self._call_details_with_auth_metadata(client_call_details)
         c: grpc.Call = continuation(updated_call_details, request)
         if c.code() == grpc.StatusCode.UNAUTHENTICATED:
-            logging.warning("CALLING FROM INTERCEPT_UNARY_STREAM")
             self._authenticator.refresh_credentials()
             updated_call_details = self._call_details_with_auth_metadata(client_call_details)
             return continuation(updated_call_details, request)

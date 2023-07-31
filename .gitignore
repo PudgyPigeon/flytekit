@@ -34,3 +34,4 @@ htmlcov
 docs/source/_tags/
 .hypothesis
 ./test.py
+.test.py

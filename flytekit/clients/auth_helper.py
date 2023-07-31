@@ -69,7 +69,9 @@ def get_authenticator(cfg: PlatformConfig, cfg_store: ClientConfigStore) -> Auth
         logging.warning("this is before returning pkce auth")
         logging.warning("THIS IS THE PLATFORM CONFIG OBJECT")
         logging.warning(cfg)
-        return PKCEAuthenticator(cfg.endpoint, cfg_store, verify=verify)
+        return PKCEAuthenticator(
+            endpoint=cfg.endpoint, cfg_store=cfg_store, audience=cfg.audience, scopes=cfg.scopes, verify=verify
+        )
     elif cfg_auth == AuthType.BASIC or cfg_auth == AuthType.CLIENT_CREDENTIALS or cfg_auth == AuthType.CLIENTSECRET:
         return ClientCredentialsAuthenticator(
             endpoint=cfg.endpoint,

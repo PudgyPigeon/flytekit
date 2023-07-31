@@ -96,7 +96,7 @@ class Credentials(object):
     used for FlytePropeller (which is fine), in order to receive id_token and other OIDC reserved scopes.
     """
 
-    AUDIENCE = ConfigEntry(LegacyConfigEntry(SECTION, "scopes", list), YamlConfigEntry("admin.audience", list))
+    AUDIENCE = ConfigEntry(LegacyConfigEntry(SECTION, "scopes"), YamlConfigEntry("admin.audience"))
     """
     This is intended to be passed into the PKCEAuthenticator and its AuthorizationClient in order to enable Auth0
     usage. An audience parameter is necessary for Auth0 token requests.
