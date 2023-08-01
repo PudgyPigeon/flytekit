@@ -66,9 +66,6 @@ def get_authenticator(cfg: PlatformConfig, cfg_store: ClientConfigStore) -> Auth
         verify = cfg.ca_cert_file_path
 
     if cfg_auth == AuthType.STANDARD or cfg_auth == AuthType.PKCE:
-        logging.warning("this is before returning pkce auth")
-        logging.warning("THIS IS THE PLATFORM CONFIG OBJECT")
-        logging.warning(cfg)
         return PKCEAuthenticator(
             endpoint=cfg.endpoint, cfg_store=cfg_store, audience=cfg.audience, scopes=cfg.scopes, verify=verify
         )
@@ -126,7 +123,6 @@ def get_authenticated_channel(cfg: PlatformConfig) -> grpc.Channel:
         if cfg.insecure
         else grpc.secure_channel(cfg.endpoint, grpc.ssl_channel_credentials())
     )  # noqa
-    logging.warning("CALLING FUNCTION HERE")
     return upgrade_channel_to_authenticated(cfg, channel)
 
 

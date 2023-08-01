@@ -106,10 +106,6 @@ class PKCEAuthenticator(Authenticator):
         self._auth_client = None
         self._audience = audience
         self._scopes = scopes
-        logging.warning("AUDIENCE::")
-        logging.warning(audience)
-        logging.warning("SCOPES::")
-        logging.warning(scopes)
 
     def _initialize_auth_client(self):
         if not self._auth_client:
@@ -138,8 +134,6 @@ class PKCEAuthenticator(Authenticator):
                 self._creds = self._auth_client.refresh_access_token(self._creds)
                 if self._creds:
                     KeyringStore.store(self._creds)
-
-                    logging.warning("FINISHING auth initialization")
                 return
             except AccessTokenNotFoundError:
                 logging.warning("Failed to refresh token. Kicking off a full authorization flow.")

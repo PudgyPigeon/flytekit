@@ -45,23 +45,16 @@ class KeyringStore:
 
     @staticmethod
     def retrieve(for_endpoint: str) -> typing.Optional[Credentials]:
-        logging.warning("ATTEMPTING TO INITIALIZE KEYRING STORE")
         try:
-            logging.warning("TRYING TO RUN KEYRING PACKAGE METHODS")
             refresh_token = _keyring.get_password(for_endpoint, KeyringStore._refresh_token_key)
-            logging.warning("REFRESH TOKEN: ")
-            logging.warning(refresh_token)
-            logging.warning("RUNNING ACCESSTOKEN METHOD AFTER REFRESH TOKEN")
             access_token = _keyring.get_password(for_endpoint, KeyringStore._access_token_key)
         except NoKeyringError as e:
             logging.warning(f"KeyRing not available, tokens will not be cached. Error: {e}")
             return None
 
         if not access_token:
-            logging.warning("NO ACCESS TOKEN, RETURNING NONE")
             return None
 
-        logging.warning("RETURNING CREDENTIALS DATACLASS OBJECT")
         return Credentials(access_token, refresh_token, for_endpoint)
 
     @staticmethod
