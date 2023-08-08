@@ -37,9 +37,9 @@ class AuthUnaryInterceptor(grpc.UnaryUnaryClientInterceptor, grpc.UnaryStreamCli
         if auth_metadata:
             metadata = []
             if client_call_details.metadata:
+
                 metadata.extend(list(client_call_details.metadata))
             metadata.append(auth_metadata)
-
         return _ClientCallDetails(
             client_call_details.method,
             client_call_details.timeout,

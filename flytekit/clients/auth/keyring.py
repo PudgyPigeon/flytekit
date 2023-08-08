@@ -54,6 +54,7 @@ class KeyringStore:
 
         if not access_token:
             return None
+
         return Credentials(access_token, refresh_token, for_endpoint)
 
     @staticmethod

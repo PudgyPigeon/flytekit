@@ -86,6 +86,21 @@ class Credentials(object):
     """
 
     SCOPES = ConfigEntry(LegacyConfigEntry(SECTION, "scopes", list), YamlConfigEntry("admin.scopes", list))
+    """
+    This is intended to be passed into the PKCEAuthenticator and its AuthorizationClient in order to enable Auth0
+    usage. Auth0 custom APIs do not allow end-users to return an id_token without specific OIDC scopes. However,
+    these OIDC scopes are reserved keywords and may not be granted to clients in Auth0 APIs. Therefore, setting it
+    in the Helm chart as per Flyte instructions on the documentation site will lead to failed auth flows.
+
+    For auth0, it is required to pass in a custom scope separate from the one defined in the Helm chart - which is
+    used for FlytePropeller (which is fine), in order to receive id_token and other OIDC reserved scopes.
+    """
+
+    AUDIENCE = ConfigEntry(LegacyConfigEntry(SECTION, "scopes"), YamlConfigEntry("admin.audience"))
+    """
+    This is intended to be passed into the PKCEAuthenticator and its AuthorizationClient in order to enable Auth0
+    usage. An audience parameter is necessary for Auth0 token requests.
+    """
 
     AUTH_MODE = ConfigEntry(LegacyConfigEntry(SECTION, "auth_mode"), YamlConfigEntry("admin.authType"))
     """
