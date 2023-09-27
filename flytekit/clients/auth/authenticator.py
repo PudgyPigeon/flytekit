@@ -281,6 +281,8 @@ class DeviceCodeAuthenticator(Authenticator):
             raise AuthenticationError(
                 "Device Authentication is not available on the Flyte backend / authentication server"
             )
+        self._headers = {"content-type": "application/x-www-form-urlencoded"}
+
 
         super().__init__(
             endpoint=endpoint,
