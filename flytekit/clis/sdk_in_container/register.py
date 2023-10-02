@@ -24,7 +24,19 @@ This means that a zip is created from the detected root of the packages given an
 Note: This command only works on regular Python packages, not namespace packages. When determining
 the root of your project, it finds the first folder that does not have a ``__init__.py`` file.
 """
-
+def key_value_callback(_: typing.Any, param: str, values: typing.List[str]) -> typing.Optional[typing.Dict[str, str]]:
+    """
+    Callback for click to parse key-value pairs.
+    """
+    if not values:
+        return None
+    result = {}
+    for v in values:
+        if "=" not in v:
+            raise click.BadParameter(f"Expected key-value pair of the form key=value, got {v}")
+        k, v = v.split("=", 1)
+        result[k.strip()] = v.strip()
+    return result
 
 @click.command("register", help=_register_help)
 @click.option(
@@ -113,6 +125,16 @@ the root of your project, it finds the first folder that does not have a ``__ini
     is_flag=True,
     help="Execute registration in dry-run mode. Skips actual registration to remote",
 )
+@click.option(
+    "--envs",
+    "envs",
+    required=False,
+    multiple=True,
+    default="",
+    type=str,
+    callback=key_value_callback,
+    help="Environment variables to set in the container",
+)
 @click.argument("package-or-module", type=click.Path(exists=True, readable=True, resolve_path=True), nargs=-1)
 @click.pass_context
 def register(
@@ -129,6 +151,7 @@ def register(
     non_fast: bool,
     package_or_module: typing.Tuple[str],
     dry_run: bool,
+    envs: typing.Optional[str],
 ):
     """
     see help
@@ -179,6 +202,9 @@ def register(
             package_or_module=package_or_module,
             remote=remote,
             dry_run=dry_run,
+            envs=envs,
         )
     except Exception as e:
         raise e
+
+
