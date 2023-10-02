@@ -129,7 +129,7 @@ def key_value_callback(_: typing.Any, param: str, values: typing.List[str]) -> t
     "--envs",
     "envs",
     required=False,
-    multiple=True,
+    # multiple=True,
     default="",
     type=str,
     callback=key_value_callback,
