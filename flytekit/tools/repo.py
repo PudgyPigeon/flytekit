@@ -217,6 +217,7 @@ def register(
     fast: bool,
     package_or_module: typing.Tuple[str],
     remote: FlyteRemote,
+    envs: typing.Optional[str],
     dry_run: bool = False,
 ):
     detected_root = find_common_root(package_or_module)
@@ -238,6 +239,7 @@ def register(
         version=version,
         image_config=image_config,
         fast_serialization_settings=fast_serialization_settings,
+        env=envs,
     )
 
     if not version and fast:

@@ -10,6 +10,7 @@ from flytekit.configuration import ImageConfig
 from flytekit.configuration.default_images import DefaultImages
 from flytekit.loggers import cli_logger
 from flytekit.tools import repo
+import json
 
 _register_help = """
 This command is similar to ``package`` but instead of producing a zip file, all your Flyte entities are compiled,
@@ -25,6 +26,10 @@ Note: This command only works on regular Python packages, not namespace packages
 the root of your project, it finds the first folder that does not have a ``__init__.py`` file.
 """
 
+def convert_envs(_: typing.Any, param: str, envs: str):
+    if not envs:
+        return None
+    return json.loads(envs)
 
 @click.command("register", help=_register_help)
 @click.option(
@@ -113,6 +118,13 @@ the root of your project, it finds the first folder that does not have a ``__ini
     is_flag=True,
     help="Execute registration in dry-run mode. Skips actual registration to remote",
 )
+@click.option(
+    "--envs",
+    "envs",
+    required=False,
+    callback=convert_envs,
+    help="Environment variables to set in the container",
+)
 @click.argument("package-or-module", type=click.Path(exists=True, readable=True, resolve_path=True), nargs=-1)
 @click.pass_context
 def register(
@@ -129,6 +141,7 @@ def register(
     non_fast: bool,
     package_or_module: typing.Tuple[str],
     dry_run: bool,
+    envs: typing.Optional[typing.Dict[str, str]] = None,
 ):
     """
     see help
@@ -179,6 +192,9 @@ def register(
             package_or_module=package_or_module,
             remote=remote,
             dry_run=dry_run,
+            envs=envs,
         )
     except Exception as e:
         raise e
+
+
