@@ -10,6 +10,7 @@ from flytekit.configuration import ImageConfig
 from flytekit.configuration.default_images import DefaultImages
 from flytekit.loggers import cli_logger
 from flytekit.tools import repo
+import json
 
 _register_help = """
 This command is similar to ``package`` but instead of producing a zip file, all your Flyte entities are compiled,
@@ -24,19 +25,27 @@ This means that a zip is created from the detected root of the packages given an
 Note: This command only works on regular Python packages, not namespace packages. When determining
 the root of your project, it finds the first folder that does not have a ``__init__.py`` file.
 """
-def key_value_callback(_: typing.Any, param: str, values: typing.List[str]) -> typing.Optional[typing.Dict[str, str]]:
-    """
-    Callback for click to parse key-value pairs.
-    """
-    if not values:
+# def key_value_callback(_: typing.Any, param: str, values: typing.List[str]) -> typing.Optional[typing.Dict[str, str]]:
+#     """
+#     Callback for click to parse key-value pairs.
+#     """
+#     if not values:
+#         return None
+#     result = {}
+#     for v in values:
+#         if "=" not in v:
+#             raise click.BadParameter(f"Expected key-value pair of the form key=value, got {v}")
+#         k, v = v.split("=", 1)
+#         result[k.strip()] = v.strip()
+#     return result
+
+def convert_envs(_: typing.Any, param: str, envs: str):
+    if not envs:
         return None
-    result = {}
-    for v in values:
-        if "=" not in v:
-            raise click.BadParameter(f"Expected key-value pair of the form key=value, got {v}")
-        k, v = v.split("=", 1)
-        result[k.strip()] = v.strip()
-    return result
+    print(_)
+    print(param)
+    print(json.loads(envs))
+    return json.loads(envs)
 
 @click.command("register", help=_register_help)
 @click.option(
@@ -130,9 +139,9 @@ def key_value_callback(_: typing.Any, param: str, values: typing.List[str]) -> t
     "envs",
     required=False,
     # multiple=True,
-    default="",
-    type=str,
-    callback=key_value_callback,
+    # default="",
+    # type=str,
+    callback=convert_envs,
     help="Environment variables to set in the container",
 )
 @click.argument("package-or-module", type=click.Path(exists=True, readable=True, resolve_path=True), nargs=-1)
@@ -151,7 +160,7 @@ def register(
     non_fast: bool,
     package_or_module: typing.Tuple[str],
     dry_run: bool,
-    envs: typing.Optional[str],
+    envs: typing.Optional[typing.Dict[str, str]] = None,
 ):
     """
     see help
