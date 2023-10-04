@@ -3,7 +3,6 @@ import tarfile
 import tempfile
 import typing
 from pathlib import Path
-import json
 
 import click
 
@@ -218,7 +217,6 @@ def register(
     fast: bool,
     package_or_module: typing.Tuple[str],
     remote: FlyteRemote,
-    # envs: typing.Optional[typing.Dict[str, str]],
     envs: typing.Optional[str],
     dry_run: bool = False,
 ):
@@ -241,7 +239,7 @@ def register(
         version=version,
         image_config=image_config,
         fast_serialization_settings=fast_serialization_settings,
-        env=envs, #json.loads(envs),
+        env=envs,
     )
 
     if not version and fast:
